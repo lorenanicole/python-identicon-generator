@@ -14,3 +14,8 @@ Users often work collaboratively in digital environments where a profile picture
 3. Images should be reasonably unique, for instance the strings "John", "Jane", and "931D387731bBbC988B31220" should generate three distinct images
 4. Any languages may be used, any libraries may be used, recommend javascript or python
 5. Don’t use an existing library! Treat this exercise as if you looked at existing solutions and thought you could do better, and decided to write your own
+
+## Identicon Requirements
+1. The identicon's should be symmetrical meaning the left horizontal half is equal to the right horizontal half.
+2. The identicon is 5X5 pixels, following the standard specified for [GitHub identicons](https://github.blog/2013-08-14-identicons/)
+3. Identicon's should use accessible colors as specified by [W3](https://www.w3.org/WAI/WCAG21/Techniques/general/G207)
