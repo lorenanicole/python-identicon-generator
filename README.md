@@ -19,3 +19,9 @@ Users often work collaboratively in digital environments where a profile picture
 1. The identicon's should be symmetrical meaning the left horizontal half is equal to the right horizontal half.
 2. The identicon is 5X5 pixels, following the standard specified for [GitHub identicons](https://github.blog/2013-08-14-identicons/)
 3. Identicon's should use accessible colors as specified by [W3](https://www.w3.org/WAI/WCAG21/Techniques/general/G207)
+
+## TODO:
+- [ ] Finish script to implement identicon
+- [ ] Implement core logic to generate a Python PIL or Tinkr image
+- [ ] Write baseline tests
+- [ ] Add CI/CD with GitHub actions to run tests
