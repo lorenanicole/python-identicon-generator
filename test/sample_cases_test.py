@@ -25,7 +25,7 @@ def redirect_stdout(new_out):
 class TestHappyPath(unittest.TestCase):
     def test_fails_to_create_identicon_with_input_text_missing(self):
         with self.assertRaises(subprocess.CalledProcessError) as context:
-            error_received = subprocess.check_output(f'python3 {PROJECT_ROOT}/main.py', shell=True, stderr=subprocess.STDOUT).strip()
+            subprocess.check_output(f'python3 {PROJECT_ROOT}/main.py', shell=True, stderr=subprocess.STDOUT).strip()
             self.assertIn(context.exception.message, "main.py: error: the following arguments are required: -s/--string")
     
     def test_creates_identicon_when_input_text_provided(self):
