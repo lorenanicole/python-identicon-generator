@@ -9,60 +9,83 @@ __email__ = "me@lorenamesa.com"
 
 
 def convert_string_to_sha_hash(input_str: str) -> str:
-    input_str = input_str.encode('utf-8')
-    return hashlib.md5(input_str).hexdigest()
+    """
+    Function that takes an input string and returns a md5 hexdigest string.
 
-def build_grid(md5hash: str) -> list[list]:
-    grid_size = 5
-    grid = []
-    for i in range(grid_size):
-        row = list()
-        for j in range(grid_size):
-            c = i * grid_size + j + 6
-            # List of lists with booleans
-            # Make a filter indicating which pixels to fill
-            b = int(md5hash[c], base=16) % 2 == 0
-            row.append(b)
+    :return: md5 hexdigest of an input string
+    """
+    return hashlib.md5(input_str.encode('utf-8')).hexdigest()
+
+def build_grid(md5hash_str: str) -> list[list]:
+    """
+    Function that takes an input md5 hexdigest string and builds
+    a list of lists using grid size to determine the size of the 
+    grid. Each value within the list of lists contains a row of booleans
+    that indicates if that given element will be filled with a color.
+
+    :param md5hash_str: md5 hexdigest of an input string
+    :return: a list of lists representing a grid of the pixels to be drawn in a PIL Image
+    """
+    grid_size: int = 5
+    grid: list = []
+    for row_number in range(grid_size):
+        row: list = list()
+        for element_number in range(grid_size):
+            element: int = row_number * grid_size + element_number + 6
+            fill_element: bool = int(md5hash_str[element], base=16) % 2 == 0
+            row.append(fill_element)
         grid.append(row)
     return grid
 
-def generate_foreground_color(hash_str: str) -> tuple:
-    return tuple(int(hash_str[i:i+2], base=16) for i in range(0, 2*3, 2))
+def generate_image_fill_color(md5hash_str: str) -> tuple:
+    """
+    Function that generates a R,G,B value to use to fill the PIL Image.
 
-def draw_image(grid: list[list], hash_str: str) -> Image:
+    :param md5hash_str: md5 hexdigest of an input string
+    :return: a tuple of numbers representing the R,G.B value to fill the PIL Image
+    """
+    return tuple(int(md5hash_str[i:i+2], base=16) for i in range(0, 2*3, 2))
 
-    fill_color = generate_foreground_color(hash_str)
+def draw_image(grid: list[list], md5hash_str: str, filename: str=None) -> Image:
+    """
+    Function that accepts a grid - a list of lists - indicating which pixels are to be filled
+    and the md5hash_str to generate an image fill color. Function creates a PIL Image, drawing it,
+    and saving it.
 
-    SQUARE = 50
-    size = (5 * 50, 5 * 50)
-    bg_color  = (214,214,214)
+    :param grid: a list of lists representing a grid of the pixels to be drawn in a PIL Image
+    :param md5hash_str: md5 hexdigest of an input string
+    :param filename: filename of PIL png image generated
+    :return: None
+    """
 
-    image = Image.new("RGB", size, bg_color)
-    draw  = ImageDraw.Draw(image)
+    fill_color: tuple = generate_image_fill_color(md5hash_str)
+
+    SQUARE: int = 50
+    size: tuple = (5 * 50, 5 * 50)
+    bg_color: size  = (214,214,214)
+
+    image: Image = Image.new("RGB", size, bg_color)
+    draw: ImageDraw  = ImageDraw.Draw(image)
 
     # Makes the identicon symmetrical
     for i in range(5):
         grid[i][4] = grid[i][0]
         grid[i][3] = grid[i][1]
 
-    for x in range(5):
-        for y in range(5):
-            if grid[x][y]:
-                bounding_box = [y * SQUARE, x * SQUARE, y * SQUARE + SQUARE, x * SQUARE + SQUARE]
+    for row in range(5):
+        for element in range(5):
+            # Boolean check to confirm 'True' to draw and fill the pixel in the iamge
+            if grid[row][element]:
+                bounding_box: list[int] = [element * SQUARE, row * SQUARE, element * SQUARE + SQUARE, row * SQUARE + SQUARE]
                 # TODO: Should we use multiple fill colors? May need to draw multiple rectangles to obtain this
                 draw.rectangle(bounding_box, fill=fill_color)
 
-    image.show()
-    # TODO: Customize with name if arg provided
-    image.save("example.png")
-    return image
+    if not filename:
+        filename: str = 'example'
+
+    image.save(f'{filename}.png')
 
 if __name__ == '__main__':
-    # usage = """
-    # python identicon.py -text="hello world"
-    # python identicon.py -text="Thy bones are marrowless, thy blood is cold."
-    # python identicon.py -text="bill.gates@microsoft.com" -dir="path/to/folder"
-    # """
     # parser = argparse.ArgumentParser(
     #     description="Generate an identicon with Python 3.", 
     #     usage="""Example: python main.py -s='931D387731bBbC988B31220' or add the optional -o flag to specify name of identicon 
@@ -93,7 +116,7 @@ if __name__ == '__main__':
   
     # args = parser.parse_args()
   
-    # hash_str =convert_string_to_sha_hash("931D387731bBbC988B31220")
-    hash_str = convert_string_to_sha_hash("me@lorenamesa.com")
+    hash_str =convert_string_to_sha_hash("931D387731bBbC988B31220")
+    # hash_str = convert_string_to_sha_hash("me@lorenamesa.com")
     grid = build_grid(hash_str)
     draw_image(grid, hash_str)
