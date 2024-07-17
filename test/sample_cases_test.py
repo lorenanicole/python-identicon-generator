@@ -1,25 +1,13 @@
-import subprocess
-import os
-import sys
+#!/usr/bin/env python3
+
 from pathlib import Path
-import time
+import subprocess
 import unittest
 
+__author__ = "Lorena Mesa"
+__email__ = "me@lorenamesa.com"
 
 PROJECT_ROOT = Path(__file__).parent.parent.absolute()
-
-from contextlib import contextmanager
-
-
-@contextmanager
-def redirect_stdout(new_out):
-    # https://stackoverflow.com/questions/47066063/how-to-capture-python-subprocess-stdout-in-unittest
-    old_stdout = os.dup(1)
-    try:
-        os.dup2(new_out, sys.stdout.fileno())
-        yield
-    finally:
-        os.dup2(old_stdout, 1)
     
 
 class TestHappyPath(unittest.TestCase):
