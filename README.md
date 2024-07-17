@@ -23,5 +23,6 @@ Users often work collaboratively in digital environments where a profile picture
 ## TODO:
 - [ ] Finish script to implement identicon with multiple colors
 - [X] Implement core logic to generate a Python PIL or Tinkr image
-- [ ] Write baseline tests
-- [ ] Add CI/CD with GitHub actions to run tests
+- [X] Write baseline tests
+- [ ] Add CI/CD with GitHub actions to run tests 
+- [X] Add CI/CD with GitHub Actions to run linter
