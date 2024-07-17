@@ -1,27 +1,61 @@
 #!/usr/bin/env python3
 
-import hashlib
 import argparse
+import hashlib
+from PIL import Image, ImageDraw
 
 __author__ = "Lorena Mesa"
 __email__ = "me@lorenamesa.com"
 
 
-def convert_string_to_sha_hash(input_str: str): 
-    try:
-        input_str = input_str.encode('utf-8')
-        md5hash = hashlib.md5(input_str).hexdigest()
-        decimal_int = int(md5hash, 16)
-        # Exclude the leading '0b' when converting to binary str
-        binary_str = bin(decimal_int)[2:]
+def convert_string_to_sha_hash(input_str: str) -> str:
+    input_str = input_str.encode('utf-8')
+    return hashlib.md5(input_str).hexdigest()
 
-        r,g,b = tuple(binary_str[i:i+2] 
-                    for i in range(0, 2*3, 2))
+def build_grid(md5hash: str) -> list[list]:
+    grid_size = 5
+    grid = []
+    for i in range(grid_size):
+        row = list()
+        for j in range(grid_size):
+            c = i * grid_size + j + 6
+            # List of lists with booleans
+            # Make a filter indicating which pixels to fill
+            b = int(md5hash[c], base=16) % 2 == 0
+            row.append(b)
+        grid.append(row)
+    return grid
 
-        print(r, g, b)
-    except TypeError:
-        raise TypeError("Cannot encode string before hashing.")
-    
+def generate_foreground_color(hash_str: str) -> tuple:
+    return tuple(int(hash_str[i:i+2], base=16) for i in range(0, 2*3, 2))
+
+def draw_image(grid: list[list], hash_str: str) -> Image:
+
+    fill_color = generate_foreground_color(hash_str)
+
+    SQUARE = 50
+    size = (5 * 50, 5 * 50)
+    bg_color  = (214,214,214)
+
+    image = Image.new("RGB", size, bg_color)
+    draw  = ImageDraw.Draw(image)
+
+    # Makes the identicon symmetrical
+    for i in range(5):
+        grid[i][4] = grid[i][0]
+        grid[i][3] = grid[i][1]
+
+    for x in range(5):
+        for y in range(5):
+            if grid[x][y]:
+                bounding_box = [y * SQUARE, x * SQUARE, y * SQUARE + SQUARE, x * SQUARE + SQUARE]
+                # TODO: Should we use multiple fill colors? May need to draw multiple rectangles to obtain this
+                draw.rectangle(bounding_box, fill=fill_color)
+
+    image.show()
+    # TODO: Customize with name if arg provided
+    image.save("example.png")
+    return image
 
 if __name__ == '__main__':
     # usage = """
@@ -59,4 +93,7 @@ if __name__ == '__main__':
   
     # args = parser.parse_args()
   
-    convert_string_to_sha_hash("931D387731bBbC988B31220")
+    # hash_str =convert_string_to_sha_hash("931D387731bBbC988B31220")
+    hash_str = convert_string_to_sha_hash("me@lorenamesa.com")
+    grid = build_grid(hash_str)
+    draw_image(grid, hash_str)
