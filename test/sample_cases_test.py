@@ -1,27 +1,40 @@
 import subprocess
-import time
-from os import remove
+import os
+import sys
 from pathlib import Path
+import time
 import unittest
 
 
-PROJECT_ROOT = Path(__file__).parent.absolute()
+PROJECT_ROOT = Path(__file__).parent.parent.absolute()
 
-def test_sample_case_one():
-    subprocess.Popen(
-        f'python3 main.py --t lorena@example.io --o lorenaemail',
-        cwd=f"{PROJECT_ROOT.parent}",
-        stdin=subprocess.PIPE,
-        shell=True,
-    )
+from contextlib import contextmanager
 
-    time.sleep(1)
 
-    output = []
-    with open(f"{PROJECT_ROOT}/lorenaoutput.png", "rb") as f:
-        output = f.readlines(); print(output)
-        output = list(map(lambda l: l.decode("utf-8"), output))
+@contextmanager
+def redirect_stdout(new_out):
+    # https://stackoverflow.com/questions/47066063/how-to-capture-python-subprocess-stdout-in-unittest
+    old_stdout = os.dup(1)
+    try:
+        os.dup2(new_out, sys.stdout.fileno())
+        yield
+    finally:
+        os.dup2(old_stdout, 1)
+    
 
-    remove(f"{PROJECT_ROOT}/lorenaoutput.png")
+class TestHappyPath(unittest.TestCase):
+    def test_fails_to_create_identicon_with_input_text_missing(self):
+        with self.assertRaises(subprocess.CalledProcessError) as context:
+            error_received = subprocess.check_output(f'python3 {PROJECT_ROOT}/main.py', shell=True, stderr=subprocess.STDOUT).strip()
+            self.assertIn(context.exception.message, "main.py: error: the following arguments are required: -s/--string")
+    
+    def generates_
 
-    assert output == ['Result(value=6, parser=infix, expression="3*2")']
+
+      # hash_str =convert_string_to_sha_hash("931D387731bBbC988B31220")
+    # hash_str = convert_string_to_sha_hash("me@lorenamesa.com")
+    # grid = build_grid(hash_str)
+    # draw_image(grid, hash_str)
+
+if __name__ == '__maipython -m unittestn__':
+    unittest.main()
