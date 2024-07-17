@@ -29,7 +29,7 @@ class TestUI(unittest.TestCase):
 class TestHappyPath(unittest.TestCase):
     def test_successfully_creates_identicon(self):
         identicon = Identicon("931D387731bBbC988B31220")
-        identicon.draw_image(filename="output")
+        identicon.render(filename="output")
         generated_image = Image.open(f"{PROJECT_ROOT}/output.png", mode="r")
         self.assertIsInstance(generated_image, PngImagePlugin.PngImageFile)
         remove(f"{PROJECT_ROOT}/output.png")
@@ -37,10 +37,10 @@ class TestHappyPath(unittest.TestCase):
     def test_successfully_creates_same_identicon_for_same_input_strings(self):
         # Make 1st identicon 
         identicon_john_1 = Identicon("john")
-        identicon_john_1.draw_image(filename="john1")
+        identicon_john_1.render(filename="john1")
         # Make 2nd identicon
         identicon_john_2 = Identicon("john")
-        identicon_john_2.draw_image(filename="john2")
+        identicon_john_2.render(filename="john2")
 
         # Assertions
         generated_john_1 = Image.open(f"{PROJECT_ROOT}/john1.png", mode="r")
@@ -58,10 +58,10 @@ class TestHappyPath(unittest.TestCase):
     def test_does_not_create_same_identicon_for_different_input_strings(self):
         # Make 1st identicon 
         identicon_john = Identicon("john")
-        identicon_john.draw_image(filename="john")
+        identicon_john.render(filename="john")
         # Make 2nd identicon
         identicon_john_2 = Identicon("jane")
-        identicon_john_2.draw_image(filename="jane")
+        identicon_john_2.render(filename="jane")
 
         # Assertions
         generated_john = Image.open(f"{PROJECT_ROOT}/john.png", mode="r")
@@ -76,18 +76,29 @@ class TestHappyPath(unittest.TestCase):
         remove(f"{PROJECT_ROOT}/john.png")
         remove(f"{PROJECT_ROOT}/jane.png")
     
-    def test_successfully_resizes_identicon_gt_250_when_dimensions_provided(self):
+    def test_successfully_resizes_identicon_gt_default_when_dimensions_provided(self):
         identicon_john = Identicon("john")
-        identicon_john.draw_image(filename="john", dimensions=300)
+        identicon_john.render(filename="john", dimensions=450)
 
         # Assertions
         generated_john = Image.open(f"{PROJECT_ROOT}/john.png", mode="r")
         self.assertIsInstance(generated_john, PngImagePlugin.PngImageFile)
-        self.assertEqual(generated_john.size, (300, 300))
+        self.assertEqual(generated_john.size, (450, 450))
 
         # Cleanup 
         remove(f"{PROJECT_ROOT}/john.png")
 
+    def test_successfully_resizes_identicon_lt_default_when_dimensions_provided(self):
+        identicon_john = Identicon("john")
+        identicon_john.render(filename="john", dimensions=150)
+
+        # Assertions
+        generated_john = Image.open(f"{PROJECT_ROOT}/john.png", mode="r")
+        self.assertIsInstance(generated_john, PngImagePlugin.PngImageFile)
+        self.assertEqual(generated_john.size, (150, 150))
+
+        # Cleanup 
+        remove(f"{PROJECT_ROOT}/john.png")
 
 if __name__ == "__main__":
     unittest.main()

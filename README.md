@@ -17,12 +17,11 @@ Users often work collaboratively in digital environments where a profile picture
 
 ## Identicon Requirements
 1. The identicon's should be symmetrical meaning the left horizontal half is equal to the right horizontal half.
-2. The identicon is 5X5 pixels, following the standard specified for [GitHub identicons](https://github.blog/2013-08-14-identicons/), so we'll generate square identicons only with a default of 250X250 pixels
-3. Identicon's should use accessible colors as specified by [W3](https://www.w3.org/WAI/WCAG21/Techniques/general/G207)
+2. The identicon is 5X5 pixels, following the standard specified for [GitHub identicons](https://github.blog/2013-08-14-identicons/), so we'll generate square identicons only with a default of 320X320 pixels which other social media platforms like Instagram define as an ideal size
+3. Identicon's should use proper resizing sampling technique to ensure quality is maintained, see [Pillow](https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.resize) documentation for options
 
 ## TODO:
-- [ ] Finish script to implement identicon with multiple colors
-- [X] Implement core logic to generate a Python PIL or Tinkr image
+- [X] Implement core logic to generate a Python PIL image
 - [X] Write baseline tests
-- [ ] Add CI/CD with GitHub actions to run tests 
+- [X] Add CI/CD with GitHub actions to run tests 
 - [X] Add CI/CD with GitHub Actions to run linter

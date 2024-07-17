@@ -12,6 +12,9 @@ class Identicon:
 
     def __init__(self, input_str: str) -> None:
         self.md5hash_str: str = self._convert_string_to_sha_hash(input_str)
+        self.grid_size: int = 5
+        self.square_size: int = 64
+        self.identicon_size: tuple = (self.grid_size * self.square_size, self.grid_size * self.square_size)
 
     def _convert_string_to_sha_hash(self, input_str: str) -> str:
         """
@@ -27,74 +30,82 @@ class Identicon:
     def _build_grid(self) -> list[list]:
         """
         Function that takes an input md5 hexdigest string and builds
-        a list of lists using grid size to determine the size of the 
-        grid. Each value within the list of lists contains a row of booleans
-        that indicates if that given element will be filled with a color.
+        a list of lists using self.GRID_SIZE to determine the size of the 
+        grid; with the default set to a 5X5 grid. 
+        
+        Each value within the list of lists contains a row of booleans
+        that indicates if that given pizel will be filled with a color.
 
-        :return: a list of lists representing a grid of the pixels to be drawn in a PIL Image
+        :return: a list of lists representing a grid of the pixels to be 
+                 drawn and filled in a PIL Image
         """
-        grid_size: int = 5
         grid: list = []
-        for row_number in range(grid_size):
+        for row_number in range(self.grid_size):
             row: list = list()
-            for element_number in range(grid_size):
-                element: int = row_number * grid_size + element_number + 6
-                fill_element: bool = int(self.md5hash_str[element], base=16) % 2 == 0
+            for pixel in range(self.grid_size):
+                current_pixel: int = row_number * self.grid_size + pixel + 6
+                fill_element: bool = int(self.md5hash_str[current_pixel], base=16) % 2 == 0
                 row.append(fill_element)
             grid.append(row)
         return grid
 
-    def _generate_image_fill_color(self, md5hash_str: str) -> tuple:
+    def _generate_pixel_fill_color(self, md5hash_str: str) -> tuple:
         """
-        Function that generates a R,G,B value to use to fill the PIL Image.
+        Function that generates a R,G,B value to use to fill the PIL Image pixels.
 
         :param md5hash_str: md5 hexdigest of an input string
-        :return: a tuple of numbers representing the R,G.B value to fill the PIL Image
+        :return: a tuple of numbers representing the R,G,B value to fill the PIL Image pixels
         """
         return tuple(int(md5hash_str[i:i+2], base=16) for i in range(0, 2*3, 2))
 
-    def draw_image(self, filename: str=None, dimensions: int=0) -> Image:
+    def render(self, filename: str=None, dimensions: int=0) -> Image:
         """
-        Function that generates a grid - a list of lists - indicating which pixels are to be filled
-        and uses the md5hash_str to generate an image fill color. Function creates a PIL Image, drawing it,
-        and saving it. By default a 250 pixel by 250 pixel identicon is created, if upon executing the code
-        a dimensions parameter is passed in the image will be resized.
+        Function that generates a grid - a list of lists - indicating which pixels 
+        are to be filled and uses the md5hash_str to generate an image fill color. 
+        Function creates a PIL Image, drawing it, and saving it. By default a 320 
+        pixel by 320 pixel identicon is rendered, if upon executing the code a 
+        dimensions parameter is passed in the image will be resized.
 
         :param filename: filename of PIL png image generated
         :return: None
         """
 
-        fill_color: tuple = self._generate_image_fill_color(self.md5hash_str)
+        fill_color: tuple = self._generate_pixel_fill_color(self.md5hash_str)
         grid: list[list] = self._build_grid()
 
-        # Default to a 250X250 pixel image
-        SQUARE: int = 50
-        size: tuple = (5 * 50, 5 * 50)
-        bg_color: tuple = (214,214,214)
-
-        image: Image = Image.new("RGB", size, bg_color)
+        # Default to a 320X320, a recommended avtar size per social platforms like Instagram, 
+        # pixel image where each shape filled within the identicon is of size 64 pixels
+        background_color: tuple = (214,214,214)
+        image: Image = Image.new("RGB", self.identicon_size, background_color)
         draw: ImageDraw  = ImageDraw.Draw(image)
 
-        # Makes the identicon symmetrical
-        for i in range(5):
-            grid[i][4] = grid[i][0]
-            grid[i][3] = grid[i][1]
+        # Makes the identicon symmetrical by setting the right columns
+        # values to the same as the left columns, minus the center column
+        for i in range(self.grid_size):
+            grid[i][self.grid_size - 1] = grid[i][0]
+            grid[i][self.grid_size - 2] = grid[i][1]
 
-        for row in range(5):
-            for element in range(5):
+        for row in range(self.grid_size):
+            for pixel in range(self.grid_size):
                 # Boolean check to confirm 'True' to draw and fill the pixel in the iamge
-                if grid[row][element]:
-                    bounding_box: list[int] = [element * SQUARE, row * SQUARE, element * SQUARE + SQUARE, row * SQUARE + SQUARE]
-                    # TODO: Should we use multiple fill colors? May need to draw multiple rectangles to obtain this
-                    draw.rectangle(bounding_box, fill=fill_color)
+                if grid[row][pixel]:
+                    shape_coords: list[int] = [
+                        pixel * self.square_size, 
+                        row * self.square_size, 
+                        pixel * self.square_size + self.square_size, 
+                        row * self.square_size + self.square_size
+                    ]
+                    draw.rectangle(shape_coords, fill=fill_color)
 
         if not filename:
             filename: str = 'example'
   
         if dimensions:
-            wpercent: float = (dimensions / float(image.size[0]))
-            hsize: int = int((float(image.size[1]) * float(wpercent)))
-            image = image.resize((dimensions, hsize), Image.Resampling.LANCZOS)
+            # Possible resampling filters here: https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.resize
+            # BICUBIC and LANCZOS take longer to process than NEAREST, but the quality of the former is better.
+            width_percent: float = (dimensions / float(image.size[0]))
+            height: int = int((float(image.size[1]) * float(width_percent)))
+            image = image.resize((dimensions, height), Image.Resampling.LANCZOS)
         
         image.save(f'{filename}.png')
 
@@ -141,4 +152,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     identicon = Identicon(input_str=args.string)
-    identicon.draw_image(filename=args.output, dimensions=args.dimensions)
+    identicon.render(filename=args.output, dimensions=args.dimensions)
