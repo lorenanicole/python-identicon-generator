@@ -9,11 +9,24 @@ Usage:
 2. Providing the input `-t` text and a specified output `-o` name for the ouput `*.png` identicon: `python3 main.py -t helloworld -o helloworld`. 
 3. Providing the input `-t` text and a specified output `-o` name for the ouput `*.png` identicon and overriding default dimensions of 320X320 pixels e.g. 150X150 pixels: `python3 main.py -t helloworld -o helloworld -d 150`. 
 
+**Using Codespaces**
+
+*To start:*
+- From the private repo page, select <> Code button
+- Click the three ellipses next to the "fantastic barnacle" Codespace
+- Select option that says, "open in browser" and you won't need to bootstrap anything! 
+
+*To stop:*
+But please remember upon completing with Codespaces to turn it down (as there's only so many billable hours permitted per account). 
+- This can be done by closing the browser tab with the Codespace and returning to the private repo
+- Click <> Code, click next to "fantastic barnacle" via the three ellipses
+- Select "stop Codespace" as shown below:
+
 ## Problem Prompt
 
 Users often work collaboratively in digital environments where a profile picture is not available. Some platforms have attempted to solve this problem with the creation of randomly generated, unique icons for each user ([github](https://github.blog/2013-08-14-identicons/), [slack](https://slack.zendesk.com/hc/article_attachments/360048182573/Screen_Shot_2019-10-01_at_5.08.29_PM.png), [ethereum wallets](https://github.com/ethereum/blockies)) sometimes called *Identicons*. Given an arbitrary string, create an image that can serve as a unique identifier for a user of a B2B productivity app like slack, notion, etc.
 
-**Requirements**
+**Example Requirements**
 
 1. Define a set of objectives to accomplish with your identicon. There's no right or wrong answer here. Here are some hypothetical objectives:
 - Legibility at some scale or set of scales 
@@ -24,7 +37,7 @@ Users often work collaboratively in digital environments where a profile picture
 4. Any languages may be used, any libraries may be used, recommend javascript or python
 5. Don’t use an existing library! Treat this exercise as if you looked at existing solutions and thought you could do better, and decided to write your own
 
-## Identicon Requirements
+## Identicon Requirements (Defined)
 1. The identicon's should be symmetrical meaning the left horizontal half is equal to the right horizontal half.
 2. The identicon is 5X5 pixels, following the standard specified for [GitHub identicons](https://github.blog/2013-08-14-identicons/), so we'll generate square identicons only with a default of 320X320 pixels which other social media platforms like Instagram define as an ideal size
 3. Identicon's should use proper resizing sampling technique to ensure quality is maintained, see [Pillow](https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.resize) documentation for options
