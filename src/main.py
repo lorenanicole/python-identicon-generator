@@ -2,7 +2,11 @@
 
 import argparse
 import hashlib
+import io
 from PIL import Image, ImageDraw
+import time
+
+from sweepai.logn.cache import file_cache
 
 __author__ = "Lorena Mesa"
 __email__ = "me@lorenamesa.com"
@@ -10,8 +14,8 @@ __email__ = "me@lorenamesa.com"
 
 class Identicon:
 
-    def __init__(self, input_str: str) -> None:
-        self.md5hash_str: str = self._convert_string_to_sha_hash(input_str)
+    def __init__(self) -> None:
+        self.md5hash_str: str = None
         self.grid_size: int = 5
         self.square_size: int = 64
         self.identicon_size: tuple = (self.grid_size * self.square_size, self.grid_size * self.square_size)
@@ -58,7 +62,8 @@ class Identicon:
         """
         return tuple(int(md5hash_str[i:i+2], base=16) for i in range(0, 2*3, 2))
 
-    def render(self, filename: str=None, dimensions: int=0) -> Image:
+    @file_cache()
+    def render(self, input_str: str, filename: str="identicon", dimensions: int=0) -> Image:
         """
         Function that generates a grid - a list of lists - indicating which pixels 
         are to be filled and uses the md5hash_str to generate an image fill color. 
@@ -66,10 +71,15 @@ class Identicon:
         pixel by 320 pixel identicon is rendered, if upon executing the code a 
         dimensions parameter is passed in the image will be resized.
 
+        :param input_str: unique identifer input string used to generate identicon
         :param filename: filename of PIL png image generated
         :return: None
         """
 
+        # Can uncomment to confirm the @file_cache is working
+        # import time; time.sleep(5)
+
+        self.md5hash_str = self._convert_string_to_sha_hash(input_str)
         fill_color: tuple = self._generate_pixel_fill_color(self.md5hash_str)
         grid: list[list] = self._build_grid()
 
@@ -96,9 +106,6 @@ class Identicon:
                         row * self.square_size + self.square_size
                     ]
                     draw.rectangle(shape_coords, fill=fill_color)
-
-        if not filename:
-            filename: str = 'example'
   
         if dimensions:
             # Possible resampling filters here: https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.resize
@@ -106,8 +113,17 @@ class Identicon:
             width_percent: float = (dimensions / float(image.size[0]))
             height: int = int((float(image.size[1]) * float(width_percent)))
             image = image.resize((dimensions, height), Image.Resampling.LANCZOS)
-        
+
         image.save(f'{filename}.png')
+
+        # Return a unique string with the input str value and the image bytes array
+        # to allow a cache hit
+
+        byteIO = io.BytesIO()
+        image.save(byteIO, format='PNG')
+        im_bytes = byteIO.getvalue()
+        # import pdb; pdb.set_trace()
+        return f'{input_str}_{im_bytes}'
 
 
 if __name__ == '__main__':
@@ -140,7 +156,8 @@ if __name__ == '__main__':
         "-o",
         "--output",
         type=len_gt_zero,
-        help="Name for output square identicon image generated.",
+        help="Name for output square identicon PNG image generated.",
+        default='identicon'
     )
     parser.add_argument(
         "-d",
@@ -151,5 +168,9 @@ if __name__ == '__main__':
   
     args = parser.parse_args()
 
-    identicon = Identicon(input_str=args.string)
-    identicon.render(filename=args.output, dimensions=args.dimensions)
+    # Add timer to confirm performance of code
+    t0 = time.time()
+    identicon = Identicon()
+    result = identicon.render(input_str=args.string, filename=args.output, dimensions=args.dimensions)
+    t1 = time.time()
+    print(f"{t1-t0} seconds to render {args.output}.png is now available to download!")
