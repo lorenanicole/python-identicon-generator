@@ -19,6 +19,11 @@ class TestUI(unittest.TestCase):
         with self.assertRaises(subprocess.CalledProcessError) as context:
             subprocess.check_output(f"python3 {PROJECT_ROOT}/src/main.py", shell=True, stderr=subprocess.STDOUT).strip()
         self.assertIn("main.py: error: the following arguments are required: -s/--string", context.exception.output.decode('utf-8'))
+    
+    def test_ui_fails_to_create_identicon_with_dimensions_lt_1(self):
+        with self.assertRaises(subprocess.CalledProcessError) as context:
+            subprocess.check_output(f"python3 {PROJECT_ROOT}/src/main.py -d 0", shell=True, stderr=subprocess.STDOUT).strip()
+        self.assertIn("main.py: error: argument -d/--dimensions: Input square dimension (same height and width) must be greater than 1.", context.exception.output.decode('utf-8'))
 
 
 class TestHappyPath(unittest.TestCase):
@@ -71,7 +76,18 @@ class TestHappyPath(unittest.TestCase):
         remove(f"{PROJECT_ROOT}/john.png")
         remove(f"{PROJECT_ROOT}/jane.png")
     
+    def test_successfully_resizes_identicon_gt_250_when_dimensions_provided(self):
+        identicon_john = Identicon("john")
+        identicon_john.draw_image(filename="john", dimensions=300)
+
+        # Assertions
+        generated_john = Image.open(f"{PROJECT_ROOT}/john.png", mode="r")
+        self.assertIsInstance(generated_john, PngImagePlugin.PngImageFile)
+        self.assertEqual(generated_john.size, (300, 300))
+
+        # Cleanup 
+        remove(f"{PROJECT_ROOT}/john.png")
 
 
-if __name__ == '__maipython -m unittest__':
+if __name__ == "__main__":
     unittest.main()

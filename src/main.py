@@ -53,11 +53,12 @@ class Identicon:
         """
         return tuple(int(md5hash_str[i:i+2], base=16) for i in range(0, 2*3, 2))
 
-    def draw_image(self, filename: str=None) -> Image:
+    def draw_image(self, filename: str=None, dimensions: int=0) -> Image:
         """
         Function that generates a grid - a list of lists - indicating which pixels are to be filled
         and uses the md5hash_str to generate an image fill color. Function creates a PIL Image, drawing it,
-        and saving it.
+        and saving it. By default a 250 pixel by 250 pixel identicon is created, if upon executing the code
+        a dimensions parameter is passed in the image will be resized.
 
         :param filename: filename of PIL png image generated
         :return: None
@@ -66,6 +67,7 @@ class Identicon:
         fill_color: tuple = self._generate_image_fill_color(self.md5hash_str)
         grid: list[list] = self._build_grid()
 
+        # Default to a 250X250 pixel image
         SQUARE: int = 50
         size: tuple = (5 * 50, 5 * 50)
         bg_color: tuple = (214,214,214)
@@ -88,40 +90,55 @@ class Identicon:
 
         if not filename:
             filename: str = 'example'
-
-        # TODO: Confirm overwrite file is one of same name exists
+  
+        if dimensions:
+            wpercent: float = (dimensions / float(image.size[0]))
+            hsize: int = int((float(image.size[1]) * float(wpercent)))
+            image = image.resize((dimensions, hsize), Image.Resampling.LANCZOS)
+        
         image.save(f'{filename}.png')
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="Generate an identicon with Python 3.", 
         usage="""Example: python main.py -s='931D387731bBbC988B31220' or add the optional -o flag to specify name of identicon 
-        image generated such as python main.py -s='931D387731bBbC988B31220' -o='my_identicon.jpg'."""
+        image generated such as python main.py -s='931D387731bBbC988B31220' -o='my_identicon.jpg'." Additionally can specify the
+        square dimensions in pixels for the identicon such as python main.py -s='931D387731bBbC988B31220' -d 150."""
     )
-
     def len_gt_zero(input_str: str):
         if len(input_str) > 0:
             return input_str
-        raise argparse.ArgumentTypeError("Input string must have length greater than 0 in order to generate an identicon.")
-
+        else:
+            raise argparse.ArgumentTypeError("Outfile filename must have length greater than 0 in order to generate an identicon.")
+    def dimensions_gt_zero(input_dimensions: str):
+        if not input_dimensions.isdigit():
+            raise argparse.ArgumentTypeError("Input square dimension (same height and width) must be a legal int value.")
+        elif int(input_dimensions) >= 1:
+            return int(input_dimensions)
+        else:
+            raise argparse.ArgumentTypeError("Input square dimension (same height and width) must be greater than 1.")
     parser.add_argument(
         "-s",
         "--string",
-        default="",
         type=str,
         required=True,
-        help="An input string used to generate an identicon.",
+        help="An input string used to generate a squaer identicon.",
     )
     parser.add_argument(
         "-o",
         "--output",
-        default="",
-        type=str,
-        required=False,
-        help="Name for output identicon image generated.",
+        type=len_gt_zero,
+        help="Name for output square identicon image generated.",
+    )
+    parser.add_argument(
+        "-d",
+        "--dimensions",
+        type=dimensions_gt_zero,
+        help="Optional dimensionals parameter for outputing square identicon image generated."
     )
   
     args = parser.parse_args()
 
     identicon = Identicon(input_str=args.string)
-    identicon.draw_image(filename=args.output)
+    identicon.draw_image(filename=args.output, dimensions=args.dimensions)

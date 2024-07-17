@@ -17,7 +17,7 @@ Users often work collaboratively in digital environments where a profile picture
 
 ## Identicon Requirements
 1. The identicon's should be symmetrical meaning the left horizontal half is equal to the right horizontal half.
-2. The identicon is 5X5 pixels, following the standard specified for [GitHub identicons](https://github.blog/2013-08-14-identicons/)
+2. The identicon is 5X5 pixels, following the standard specified for [GitHub identicons](https://github.blog/2013-08-14-identicons/), so we'll generate square identicons only with a default of 250X250 pixels
 3. Identicon's should use accessible colors as specified by [W3](https://www.w3.org/WAI/WCAG21/Techniques/general/G207)
 
 ## TODO:
