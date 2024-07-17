@@ -28,7 +28,8 @@ class TestHappyPath(unittest.TestCase):
             error_received = subprocess.check_output(f'python3 {PROJECT_ROOT}/main.py', shell=True, stderr=subprocess.STDOUT).strip()
             self.assertIn(context.exception.message, "main.py: error: the following arguments are required: -s/--string")
     
-    def generates_
+    def test_creates_identicon_when_input_text_provided(self):
+        pass
 
 
       # hash_str =convert_string_to_sha_hash("931D387731bBbC988B31220")
@@ -36,5 +37,5 @@ class TestHappyPath(unittest.TestCase):
     # grid = build_grid(hash_str)
     # draw_image(grid, hash_str)
 
-if __name__ == '__maipython -m unittestn__':
+if __name__ == '__maipython -m unittest__':
     unittest.main()
