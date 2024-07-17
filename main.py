@@ -124,8 +124,3 @@ if __name__ == '__main__':
 
     identicon = Identicon(input_str=args.string)
     identicon.draw_image(filename=args.output)
-  
-    # hash_str =convert_string_to_sha_hash("931D387731bBbC988B31220")
-    # hash_str = convert_string_to_sha_hash("me@lorenamesa.com")
-    # grid = build_grid(hash_str)
-    # draw_image(grid, hash_str)

@@ -21,7 +21,7 @@ Users often work collaboratively in digital environments where a profile picture
 3. Identicon's should use accessible colors as specified by [W3](https://www.w3.org/WAI/WCAG21/Techniques/general/G207)
 
 ## TODO:
-- [ ] Finish script to implement identicon
-- [ ] Implement core logic to generate a Python PIL or Tinkr image
+- [ ] Finish script to implement identicon with multiple colors
+- [X] Implement core logic to generate a Python PIL or Tinkr image
 - [ ] Write baseline tests
 - [ ] Add CI/CD with GitHub actions to run tests

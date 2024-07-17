@@ -1,1 +1,1 @@
-ruffruff check --fix 
+ruff 
