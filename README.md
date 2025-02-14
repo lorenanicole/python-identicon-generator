@@ -19,7 +19,7 @@ Usage:
 *To stop:*
 But please remember upon completing with Codespaces to turn it down (as there's only so many billable hours permitted per account). 
 - This can be done by closing the browser tab with the Codespace and returning to the private repo
-- Click <> Code, click next to "fantastic barnacle" via the three ellipses
+- Click <> Code, click next to existing Codesapce via the three ellipses
 - Select "stop Codespace"
 
 ## Requirements
